@@ -1,0 +1,23 @@
+common:
+  tags:
+    - esp_nn
+    - tensorflow
+  modules:
+    - tflite-micro
+  filter: CONFIG_FULL_LIBC_SUPPORTED
+  platform_allow:
+    - esp32c3_devkitm
+    - esp32s3_devkitc/esp32s3/procpu
+    - esp32s3_eye/esp32s3/procpu
+  integration_platforms:
+    - esp32s3_devkitc/esp32s3/procpu
+  harness: console
+  harness_config:
+    type: one_line
+    regex:
+      - "~~~ALL TESTS PASSED~~~"
+tests:
+  libraries.esp_nn.tflite_micro: {}
+  libraries.esp_nn.tflite_micro.reference:
+    extra_configs:
+      - CONFIG_ESP_NN_TFLITE_MICRO_KERNELS=n

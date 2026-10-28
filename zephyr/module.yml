@@ -2,3 +2,8 @@ name: esp-nn
 build:
   cmake: zephyr
   kconfig: zephyr/Kconfig
+tests:
+  - zephyr/tests
+security:
+  external-references:
+    - pkg:github/espressif/esp-nn@v1.4.2
