@@ -1,0 +1,43 @@
+# Copyright (c) 2026 Espressif Systems (Shanghai) Co., Ltd.
+# SPDX-License-Identifier: Apache-2.0
+
+menuconfig ESP_NN
+	bool "ESP-NN library support"
+	depends on SOC_FAMILY_ESPRESSIF_ESP32
+	select REQUIRES_FULL_LIBC
+	help
+	  Enable the ESP-NN library of neural network kernels for Espressif
+	  SoCs: int8 and int16 convolution, depthwise convolution, fully
+	  connected, pooling, element-wise add and multiply, activation and
+	  softmax. The ESP32-S3 uses its 128-bit SIMD assembly kernels and
+	  the other SoCs portable C kernels.
+
+	  The ESP32-S3 optimized kernels use SIMD registers that are not
+	  preserved across context switches, so only one thread may run them.
+
+if ESP_NN
+
+choice ESP_NN_KERNELS
+	prompt "Kernel implementation"
+	default ESP_NN_OPTIMIZED
+
+config ESP_NN_OPTIMIZED
+	bool "Optimized kernels"
+	help
+	  Use the kernels optimized for the selected SoC.
+
+config ESP_NN_ANSI_C
+	bool "Reference C kernels"
+	help
+	  Use the portable reference kernels, for verification and debugging.
+
+endchoice
+
+config ESP_NN_SKIP_NUDGE
+	bool "Fast requantization"
+	depends on ESP_NN_OPTIMIZED
+	help
+	  Use a faster requantization that may differ from the TensorFlow Lite
+	  reference by one least significant bit at half-shift boundaries.
+
+endif # ESP_NN

@@ -1,0 +1,4 @@
+name: esp-nn
+build:
+  cmake: zephyr
+  kconfig: zephyr/Kconfig
