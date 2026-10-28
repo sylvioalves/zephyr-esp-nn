@@ -85,4 +85,38 @@ if(CONFIG_ESP_NN)
     zephyr_compile_definitions(ESP_NN_GENERIC_OPT)
   endif()
 
+  if(CONFIG_ESP_NN_TFLITE_MICRO_KERNELS)
+    function(esp_nn_tflite_micro_kernels)
+      set(tflm_lib modules__tflite-micro)
+      set(kernels add conv depthwise_conv fully_connected mul pooling softmax)
+      set(kernels_dir ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/tflite-micro/kernels)
+
+      if(NOT TARGET ${tflm_lib})
+        message(FATAL_ERROR "ESP-NN: tflite-micro library ${tflm_lib} not found")
+      endif()
+
+      get_target_property(sources ${tflm_lib} SOURCES)
+      list(LENGTH sources count_before)
+      list(JOIN kernels "|" kernels_regex)
+      list(FILTER sources EXCLUDE REGEX
+        "/tensorflow/lite/micro/kernels/+(${kernels_regex})\\.cc$"
+      )
+      list(LENGTH sources count_after)
+      list(LENGTH kernels count_kernels)
+      math(EXPR count_removed "${count_before} - ${count_after}")
+
+      if(NOT count_removed EQUAL count_kernels)
+        message(FATAL_ERROR "ESP-NN: replaced ${count_removed} of ${count_kernels} "
+          "tflite-micro kernels, the tflite-micro source list has changed")
+      endif()
+
+      list(TRANSFORM kernels PREPEND ${kernels_dir}/)
+      list(TRANSFORM kernels APPEND .cc)
+      set_property(TARGET ${tflm_lib} PROPERTY SOURCES ${sources} ${kernels})
+      target_compile_definitions(${tflm_lib} PRIVATE ESP_NN)
+    endfunction()
+
+    cmake_language(DEFER DIRECTORY ${CMAKE_SOURCE_DIR} CALL esp_nn_tflite_micro_kernels)
+  endif()
+
 endif()

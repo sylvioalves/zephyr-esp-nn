@@ -40,4 +40,13 @@ config ESP_NN_SKIP_NUDGE
 	  Use a faster requantization that may differ from the TensorFlow Lite
 	  reference by one least significant bit at half-shift boundaries.
 
+config ESP_NN_TFLITE_MICRO_KERNELS
+	bool "TensorFlow Lite Micro kernels"
+	default y
+	depends on TENSORFLOW_LITE_MICRO
+	help
+	  Replace the TensorFlow Lite Micro reference add, conv, depthwise
+	  conv, fully connected, mul, pooling and softmax kernels with kernels
+	  built on ESP-NN.
+
 endif # ESP_NN
