@@ -14,7 +14,16 @@
 
 #pragma once
 
-#if defined(CONFIG_NN_OPTIMIZED)
+/* Kernel selection: the component Kconfig sets CONFIG_NN_OPTIMIZED,
+ * other build systems define ESP_NN_OPTIMIZED. ESP_NN_GENERIC_OPT keeps
+ * the portable optimized kernels on a target whose SIMD kernels the
+ * toolchain cannot assemble.
+ */
+#if defined(ESP_NN_OPTIMIZED) && !defined(CONFIG_NN_OPTIMIZED)
+#define CONFIG_NN_OPTIMIZED 1
+#endif
+
+#if defined(CONFIG_NN_OPTIMIZED) && !defined(ESP_NN_GENERIC_OPT)
 // select apt optimisations
 // ESP32-S31 shares the P4 PIE/SIMD ISA, so it reuses the ESP32-P4 kernels
 #if defined(CONFIG_IDF_TARGET_ESP32P4) || defined(CONFIG_IDF_TARGET_ESP32S31)
