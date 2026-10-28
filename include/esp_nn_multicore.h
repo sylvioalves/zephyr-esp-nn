@@ -14,7 +14,7 @@
 extern "C" {
 #endif
 
-#if defined(ESP_PLATFORM)
+#if defined(ESP_PLATFORM) && !defined(ESP_NN_SINGLE_CORE)
 #include "sdkconfig.h"
 #if !defined(CONFIG_FREERTOS_UNICORE) && \
     (CONFIG_IDF_TARGET_ESP32S3 || CONFIG_IDF_TARGET_ESP32P4)
